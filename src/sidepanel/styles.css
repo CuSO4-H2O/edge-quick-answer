@@ -1,0 +1,1257 @@
+/* ==========================================================================
+   划词答题助手 — 共享样式
+   侧边栏与页面内浮层共用这一份，两个界面的观感就不会走样。
+
+   注意：本文件通过 `?inline` 以**字符串**形式导入（见 injectStyles.ts），
+   因为页面内浮层挂在 Shadow DOM 里，外部 <link> 的 CSS 进不去。
+   见 ../shared/injectStyles.ts。
+   ========================================================================== */
+
+:root {
+  --qa-brand: #4d6bfe;
+  --qa-brand-dark: #3d5bf0;
+  --qa-text: #1c1f23;
+  --qa-text-dim: #6b7280;
+  --qa-border: #e5e7eb;
+  --qa-bg: #ffffff;
+  --qa-bg-soft: #f7f8fa;
+  --qa-danger: #dc2626;
+  --qa-ok: #16a34a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--qa-bg);
+  color: var(--qa-text);
+  font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
+}
+
+/* ==========================================================================
+   高度链（很重要，改之前请读完）
+
+   flex 纵向布局要能正确滚动，从根到滚动容器必须是一条**确定的高度链**：
+   每一层都要有确定的 height 或受约束的 flex，并且带 min-height: 0
+   （flex 项默认 min-height: auto，会拒绝收缩，滚动条就不会出现）。
+
+   之前 .qa-settings 用 height: 100%，但父级是内容撑高的 → 100% 退化成 auto，
+   内容把页脚顶到容器外，再被 overflow: hidden 裁掉。
+   表现就是"设置里找不到保存按钮、右上角的叉也点不到"。
+   ========================================================================== */
+
+.qa-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- 顶栏 */
+
+.qa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--qa-border);
+  flex: 0 0 auto;
+}
+
+.qa-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.qa-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--qa-brand);
+}
+
+.qa-header-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.qa-icon-btn {
+  border: none;
+  background: transparent;
+  color: var(--qa-text-dim);
+  font-size: 15px;
+  line-height: 1;
+  padding: 5px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.qa-icon-btn:hover:not(:disabled) {
+  background: var(--qa-bg-soft);
+  color: var(--qa-text);
+}
+
+.qa-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.qa-notice {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--qa-text-dim);
+  background: var(--qa-bg-soft);
+  border-bottom: 1px solid var(--qa-border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------------------------------------------------------------- 空态 */
+
+.qa-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.qa-empty-icon {
+  font-size: 26px;
+  color: var(--qa-brand);
+  margin-bottom: 10px;
+}
+
+.qa-empty-title {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.qa-empty-tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--qa-text-dim);
+  line-height: 2;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid var(--qa-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--qa-bg-soft);
+  font: 11px/1.4 ui-monospace, Consolas, monospace;
+}
+
+/* ---------------------------------------------------------------- 消息列表 */
+
+.qa-messages {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 12px;
+  scroll-behavior: smooth;
+}
+
+.qa-msg {
+  margin-bottom: 14px;
+}
+
+.qa-msg-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.qa-bubble {
+  max-width: 92%;
+  padding: 9px 12px;
+  border-radius: 14px 14px 3px 14px;
+  background: var(--qa-brand);
+  color: #fff;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 13.5px;
+}
+
+.qa-image-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-bottom: 6px;
+  max-width: 92%;
+}
+
+.qa-image-chip {
+  max-width: 120px;
+  max-height: 80px;
+  border-radius: 8px;
+  border: 1px solid var(--qa-border);
+}
+
+.qa-answer {
+  word-break: break-word;
+}
+
+.qa-answer .qa-p {
+  margin: 0 0 8px;
+}
+
+.qa-answer .qa-p:last-child {
+  margin-bottom: 0;
+}
+
+/* 答案行高亮：本插件最常见的视觉需求就是"一眼看到答案" */
+.qa-answer-line {
+  margin: 0 0 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(77, 107, 254, 0.08);
+  border-left: 3px solid var(--qa-brand);
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+.qa-answer .qa-h {
+  margin: 10px 0 6px;
+  font-weight: 600;
+}
+
+.qa-ul {
+  margin: 0 0 8px;
+  padding-left: 18px;
+}
+
+.qa-ul li {
+  margin-bottom: 3px;
+}
+
+.qa-inline-code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--qa-bg-soft);
+  border: 1px solid var(--qa-border);
+  font: 12px/1.5 ui-monospace, Consolas, monospace;
+}
+
+.qa-pre {
+  margin: 0 0 8px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #1e2227;
+  color: #e6e6e6;
+  overflow-x: auto;
+  font: 12px/1.6 ui-monospace, Consolas, monospace;
+}
+
+.qa-msg-assistant.is-error {
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.qa-retry {
+  margin-top: 8px;
+  padding: 4px 12px;
+  border: 1px solid var(--qa-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--qa-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.qa-retry:hover {
+  border-color: var(--qa-brand);
+  color: var(--qa-brand);
+}
+
+.qa-meta {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--qa-text-dim);
+}
+
+/* 思维链 */
+.qa-reasoning {
+  margin-bottom: 8px;
+}
+
+.qa-reasoning-toggle {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  color: var(--qa-text-dim);
+  cursor: pointer;
+}
+
+.qa-reasoning-toggle:hover {
+  color: var(--qa-brand);
+}
+
+.qa-reasoning-body {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--qa-bg-soft);
+  border: 1px dashed var(--qa-border);
+  font-size: 12.5px;
+  color: var(--qa-text-dim);
+  white-space: pre-wrap;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* 等待动画 */
+.qa-typing {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.qa-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--qa-brand);
+  opacity: 0.4;
+  animation: qa-bounce 1.1s infinite ease-in-out;
+}
+
+.qa-typing span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.qa-typing span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes qa-bounce {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  35% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.qa-caret {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: var(--qa-brand);
+  animation: qa-blink 1s step-end infinite;
+}
+
+@keyframes qa-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- 输入区 */
+
+.qa-composer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--qa-border);
+  padding: 8px 10px 6px;
+  background: var(--qa-bg);
+}
+
+.qa-key-hint {
+  width: 100%;
+  margin-bottom: 7px;
+  padding: 6px 10px;
+  border: 1px dashed var(--qa-brand);
+  border-radius: 8px;
+  background: rgba(77, 107, 254, 0.06);
+  color: var(--qa-brand);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.qa-composer-inner {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.qa-input {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--qa-border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.5;
+  max-height: 160px;
+  outline: none;
+  background: var(--qa-bg);
+  color: var(--qa-text);
+}
+
+.qa-input:focus {
+  border-color: var(--qa-brand);
+  box-shadow: 0 0 0 3px rgba(77, 107, 254, 0.12);
+}
+
+.qa-send {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--qa-brand);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.qa-send:hover:not(:disabled) {
+  background: var(--qa-brand-dark);
+}
+
+.qa-send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.qa-stop {
+  background: #475569;
+}
+
+.qa-stop:hover {
+  background: #334155;
+}
+
+.qa-foot {
+  flex: 0 0 auto;
+  padding: 4px 12px 8px;
+  font-size: 10.5px;
+  color: var(--qa-text-dim);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- 设置 */
+
+/* 不用 height: 100% —— 父级可能是内容撑高的（浮层里就是），
+   那样 100% 会退化成 auto，页脚就被顶出容器并被裁掉。
+   改用受约束的 flex，配合 min-height: 0 让中间区域真正出现滚动条。 */
+.qa-settings {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.qa-settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--qa-border);
+  font-weight: 600;
+  font-size: 13px;
+  flex: 0 0 auto;
+}
+
+.qa-settings-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 12px;
+}
+
+.qa-field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.qa-field-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.qa-field-row input[type='checkbox'] {
+  margin-top: 3px;
+  flex: 0 0 auto;
+}
+
+.qa-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.qa-help {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--qa-text-dim);
+}
+
+.qa-help.block {
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.qa-help.warn {
+  color: #b45309;
+}
+
+.qa-text,
+.qa-select,
+.qa-textarea {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--qa-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  background: var(--qa-bg);
+  color: var(--qa-text);
+}
+
+.qa-textarea {
+  resize: vertical;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.qa-text:focus,
+.qa-select:focus,
+.qa-textarea:focus {
+  border-color: var(--qa-brand);
+  box-shadow: 0 0 0 3px rgba(77, 107, 254, 0.12);
+}
+
+.qa-secondary,
+.qa-primary {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.qa-secondary {
+  border: 1px solid var(--qa-border);
+  background: var(--qa-bg);
+  color: var(--qa-text);
+}
+
+.qa-secondary:hover:not(:disabled) {
+  border-color: var(--qa-brand);
+  color: var(--qa-brand);
+}
+
+.qa-secondary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.qa-primary {
+  border: none;
+  background: var(--qa-brand);
+  color: #fff;
+  font-weight: 500;
+}
+
+.qa-primary:hover {
+  background: var(--qa-brand-dark);
+}
+
+.qa-test-msg {
+  display: block;
+  margin-top: 7px;
+  font-size: 11.5px;
+  word-break: break-all;
+}
+
+.qa-test-msg.ok {
+  color: var(--qa-ok);
+}
+
+.qa-test-msg.fail {
+  color: var(--qa-danger);
+}
+
+.qa-settings-foot {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--qa-border);
+}
+
+/* ==========================================================================
+   以下为本次改动新增：引用 chip、紧凑变体、页面内浮层
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 引用 chip
+   用户要求：网页正文只在请求里发给 AI，不在对话里占地方。
+   所以气泡上只留一个来源小标签，正文一律不展开。 */
+.qa-ref-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 92%;
+  margin-bottom: 5px;
+  padding: 3px 9px;
+  border: 1px solid var(--qa-border);
+  border-radius: 999px;
+  background: var(--qa-bg-soft);
+  color: var(--qa-text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.qa-ref-chip:hover {
+  border-color: var(--qa-brand);
+  color: var(--qa-brand);
+}
+
+.qa-ref-chip.open {
+  white-space: normal;
+  border-radius: 10px;
+}
+
+.qa-ref-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qa-ref-chip.open .qa-ref-label {
+  white-space: normal;
+}
+
+.qa-ref-ico {
+  color: var(--qa-brand);
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------------- 答案更醒目
+   答案才是主角，正文比用户气泡大一号；答案行再大一号并加粗。 */
+.qa-messages-full .qa-answer {
+  font-size: 15.5px;
+  line-height: 1.72;
+}
+
+.qa-messages-compact .qa-answer {
+  font-size: 15px;
+  line-height: 1.68;
+}
+
+.qa-answer .qa-p {
+  margin: 0 0 9px;
+}
+
+.qa-messages-full .qa-answer-line {
+  font-size: 18px;
+}
+
+.qa-messages-compact .qa-answer-line {
+  font-size: 17px;
+}
+
+.qa-answer-line {
+  margin: 0 0 10px;
+  padding: 9px 13px;
+  border-radius: 9px;
+  background: rgba(77, 107, 254, 0.09);
+  border-left: 4px solid var(--qa-brand);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.qa-answer .qa-h {
+  font-size: 15px;
+}
+
+.qa-inline-code {
+  font-size: 12.5px;
+}
+
+.qa-msg-assistant.is-error {
+  font-size: 13px;
+}
+
+.qa-messages-compact {
+  padding: 10px;
+}
+
+.qa-messages-compact .qa-msg {
+  margin-bottom: 11px;
+}
+
+.qa-composer-compact {
+  padding: 7px 9px;
+}
+
+.qa-composer-compact .qa-input {
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+.qa-composer-compact .qa-send {
+  padding: 7px 12px;
+  font-size: 12.5px;
+}
+
+/* ================================================================
+   页面内浮层（Shadow DOM 内部）
+
+   宿主是零尺寸 fixed 元素，所以这里用 absolute，
+   left/top 由 content/index.ts 的定位逻辑设置。
+   ================================================================ */
+
+.qa-panel-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 384px;
+  max-width: calc(100vw - 28px);
+  max-height: min(76vh, 660px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid var(--qa-border);
+  background: var(--qa-bg);
+  color: var(--qa-text);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.22), 0 2px 8px rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+  font: 14px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC',
+    sans-serif;
+  animation: qa-panel-in 0.14s ease-out;
+}
+
+@keyframes qa-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.985);
+    /* 关键帧里显式保持隐藏：覆盖 .qa-panel-root 的基础 visibility */
+    visibility: hidden;
+  }
+  70% {
+    opacity: 1;
+    /* 到这个点还没被 .qa-panel-positioned 显示出来，就自己现身 ——
+       兜住"定位一直失败"的情况，免得面板永久隐形 */
+    visibility: visible;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+  }
+}
+
+.qa-panel-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.qa-panel-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px 7px 12px;
+  border-bottom: 1px solid var(--qa-border);
+  background: var(--qa-bg-soft);
+}
+
+.qa-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.qa-panel-actions {
+  display: flex;
+  gap: 1px;
+}
+
+/* 引用说明条：明确告诉用户正文不会占对话空间 */
+.qa-panel-ref {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--qa-border);
+  background: rgba(77, 107, 254, 0.05);
+  font-size: 11.5px;
+  color: var(--qa-text-dim);
+  cursor: pointer;
+}
+
+.qa-panel-ref input {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.qa-panel-ref-text {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 0;
+}
+
+.qa-panel-ref-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 190px;
+}
+
+.qa-panel-empty {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 26px 20px;
+  text-align: center;
+}
+
+.qa-panel-empty-title {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.qa-panel-empty-tip {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--qa-text-dim);
+}
+
+.qa-panel-composer {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 8px 9px;
+  border-top: 1px solid var(--qa-border);
+  background: var(--qa-bg);
+}
+
+.qa-panel-root .qa-input {
+  resize: none;
+  max-height: 96px;
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   浮层布局修复与新增（拖动 / 固定 / 不透明 / 截图）
+
+   要点：
+   1. 面板本身必须有确定的最大高度，并且整条高度链都带 min-height: 0，
+      中间区域才能出现滚动条（不同缩放比例下也能看全）。
+   2. 背景完全不透明：之前会被页面内容透上来，看不清。
+   3. 顶栏是拖动把手（.qa-panel-grip），按钮单独 cursor: pointer。
+   ========================================================================== */
+
+.qa-panel-root {
+  /* 完全不透明：半透明时页面文字会透上来干扰阅读 */
+  background: var(--qa-bg);
+  opacity: 1;
+  max-height: min(80vh, 720px);
+  /* 刻意不设 min-height：内容少时面板就该小 */
+
+  /*
+   * 用入场动画遮住"定位前的那一帧"。
+   *
+   * 宿主是零尺寸的 fixed 元素，React 挂载后面板会先按 left/top: 0 渲染，
+   * JS 才量得到尺寸去摆位置 —— 那一帧会闪在**屏幕左上角**。
+   *
+   * 关键帧里先保持 visibility: hidden（positionPanel 定位成功会加上
+   * .qa-panel-positioned 直接显示），到 70% 再强行显示 ——
+   * 这样即使定位一路失败（重试 10 次后放弃），面板也会自动现身，
+   * 而不是永久隐形。
+   */
+  visibility: hidden;
+  animation: qa-panel-in 0.24s ease-out both;
+}
+
+.qa-panel-root.qa-panel-positioned {
+  visibility: visible;
+}
+
+.qa-panel-inner {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 浮层里的消息区：占满剩余空间并滚动 */
+.qa-panel-root .qa-messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 顶栏做成拖动把手 */
+.qa-panel-head {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.qa-panel-head.qa-dragging {
+  cursor: grabbing;
+}
+
+.qa-panel-head .qa-icon-btn {
+  cursor: pointer;
+}
+
+.qa-grip {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  margin-right: 2px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--qa-text-dim) 0 2px,
+    transparent 2px 4px
+  );
+  opacity: 0.55;
+  flex: 0 0 auto;
+}
+
+/* 固定（置顶）按钮激活态 */
+.qa-icon-btn.qa-pinned {
+  background: rgba(77, 107, 254, 0.12);
+  color: var(--qa-brand);
+}
+
+/* ---------------------------------------------------------------- 截图 */
+
+/* 区域选择遮罩：整屏捕获，选中区域挖空 */
+.qa-shot-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.qa-shot-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.qa-shot-box {
+  position: absolute;
+  border: 2px solid var(--qa-brand);
+  background: transparent;
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.42);
+  display: none;
+}
+
+.qa-shot-box.qa-visible {
+  display: block;
+}
+
+.qa-shot-tip {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #fff;
+  font-size: 12.5px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.qa-shot-actions {
+  position: absolute;
+  display: none;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 26px rgba(15, 23, 42, 0.3);
+}
+
+.qa-shot-actions.qa-visible {
+  display: flex;
+}
+
+.qa-shot-actions button {
+  padding: 6px 12px;
+  border: 1px solid var(--qa-border);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--qa-text);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.qa-shot-actions button.qa-shot-primary {
+  border-color: var(--qa-brand);
+  background: var(--qa-brand);
+  color: #fff;
+  font-weight: 500;
+}
+
+.qa-shot-actions button:hover {
+  border-color: var(--qa-brand);
+}
+
+.qa-shot-actions button.qa-shot-primary:hover {
+  background: var(--qa-brand-dark);
+}
+
+/* ==========================================================================
+   观感改进：用户气泡排版与折叠
+   ========================================================================== */
+
+/* 气泡改成纵向 flex，好把"展开/收起"按钮放在正文之外，
+   这样折叠时按钮不会被一起裁掉。 */
+.qa-bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  /* pre-wrap 会保留选中文本里的换行；word-break: break-word 在窄面板里
+     会把词切得很碎，改成 overflow-wrap: anywhere 更稳 */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.qa-bubble-text {
+  display: block;
+  min-width: 0;
+}
+
+/* 折叠态：只显示前几行 */
+.qa-bubble-collapsed .qa-bubble-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.qa-bubble-toggle {
+  margin-top: 2px;
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, .5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.qa-bubble-toggle:hover {
+  background: rgba(255, 255, 255, .24);
+}
+
+/* 答案区同样换掉 break-word，长英文/URL 才不会碎成一片 */
+.qa-answer,
+.qa-reasoning-body {
+  overflow-wrap: anywhere;
+}
+
+/* 浮层里的气泡再收一点，避免在小面板里过于笨重 */
+.qa-messages-compact .qa-bubble {
+  padding: 8px 11px;
+  font-size: 13px;
+  max-width: 96%;
+}
+
+/* ==========================================================================
+   浮层控制条（引用 + 标注开关）
+   .qa-panel-ref 已改名，这里补上新类名
+   ========================================================================== */
+
+.qa-panel-controls {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--qa-border);
+  background: rgba(77, 107, 254, .05);
+}
+
+.qa-panel-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--qa-text-dim);
+  cursor: pointer;
+  min-width: 0;
+}
+
+.qa-panel-check input {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.qa-panel-check:hover {
+  color: var(--qa-text);
+}
+
+.qa-panel-check-text {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 0;
+}
+
+.qa-panel-check-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 170px;
+}
+
+/* ==========================================================================
+   自定义复选框
+   默认的浏览器复选框样式太弱，勾没勾上不容易看清（用户反馈过按钮"变暗点不动"）。
+   ========================================================================== */
+
+.qa-panel-check input[type='checkbox'],
+.qa-field-row input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1.5px solid var(--qa-border);
+  border-radius: 4px;
+  background: var(--qa-bg);
+  cursor: pointer;
+  position: relative;
+  transition: background .12s ease, border-color .12s ease;
+}
+
+.qa-panel-check input[type='checkbox']:hover:not(:disabled),
+.qa-field-row input[type='checkbox']:hover:not(:disabled) {
+  border-color: var(--qa-brand);
+}
+
+.qa-panel-check input[type='checkbox']:checked,
+.qa-field-row input[type='checkbox']:checked {
+  background: var(--qa-brand);
+  border-color: var(--qa-brand);
+}
+
+/* 对勾 */
+.qa-panel-check input[type='checkbox']:checked::after,
+.qa-field-row input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.qa-panel-check input[type='checkbox']:disabled,
+.qa-field-row input[type='checkbox']:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.qa-panel-check input[type='checkbox']:focus-visible,
+.qa-field-row input[type='checkbox']:focus-visible {
+  outline: 2px solid rgba(77, 107, 254, .45);
+  outline-offset: 1px;
+}
+
+/* ==========================================================================
+   标注的可见性加固
+   悬浮标注是 fixed 定位，宿主页面若在祖先上设了 overflow: hidden，
+   个别布局下会把 fixed 元素一起裁掉。这里把标注做得更醒目，
+   并确保它自身不被裁。
+   ========================================================================== */
+
+.qa-mark {
+  /* 比原来的绿色块更抢眼：加深描边与阴影 */
+  border: 1.5px solid rgba(255, 255, 255, .85);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, .45), 0 1px 3px rgba(15, 23, 42, .25);
+  font-weight: 600;
+  animation: qa-mark-in .18s ease-out;
+}
+
+@keyframes qa-mark-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.qa-ring {
+  /* 加一层很淡的底色，让"这一行被选中"更明确 */
+  background: rgba(22, 163, 74, .06);
+}

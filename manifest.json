@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "划词答题助手 (DeepSeek)",
+  "version": "0.1.0",
+  "description": "选中网页文字或用快捷键呼出侧边栏，由 DeepSeek 流式解答题目，支持追问与截图识屏。",
+  "minimum_chrome_version": "114",
+
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "https://api.deepseek.com/*",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["src/welcome/index.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+
+  "action": {
+    "default_title": "划词答题助手（点击打开侧边栏）",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "commands": {
+    "open-side-panel": {
+      "suggested_key": { "default": "Alt+Shift+S" },
+      "description": "打开答题侧边栏并带上当前选中文字"
+    }
+  }
+}

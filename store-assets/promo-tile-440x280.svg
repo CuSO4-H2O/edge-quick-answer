@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f8fa"/><stop offset="1" stop-color="#eaeefb"/>
+    </linearGradient>
+    <linearGradient id="ib" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4d6bfe"/><stop offset="1" stop-color="#3d5bf0"/>
+    </linearGradient>
+  </defs>
+  <rect width="440" height="280" fill="url(#bg)"/>
+  <rect x="48" y="104.8" width="70.4" height="70.4"
+        rx="15" fill="url(#ib)"/>
+  <path d="M 88.83200000000001 104.8 L 71.232 137.184
+           L 83.904 137.184 L 77.568 175.2"
+        fill="none" stroke="#fff" stroke-width="7.040000000000001"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="166.4" y="137.04"
+        font-family="-apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="37" font-weight="700" fill="#1c1f23">划词答题助手</text>
+  <text x="166.4" y="155"
+        font-family="-apple-system, 'Segoe UI', 'Microsoft YaHei', sans-serif" font-size="12" fill="#6b7280">选中即答 · DeepSeek 驱动</text>
+</svg>
