@@ -75,7 +75,7 @@
 
 如有隐私相关问题，请通过项目仓库的 Issues 提出：
 
-`<在此填入你的仓库地址>`
+<https://github.com/CuSO4-H2O/edge-quick-answer/issues>
 
 ---
 
@@ -91,4 +91,5 @@ DeepSeek API endpoint (`https://api.deepseek.com`) to generate an answer.
 - Chat history is kept in the tab's session storage and cleared when the tab closes.
 - The only third party involved is DeepSeek, which you configure yourself.
 
-Contact: please open an issue in the project repository.
+Contact: please open an issue at
+<https://github.com/CuSO4-H2O/edge-quick-answer/issues>.
